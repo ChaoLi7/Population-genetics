@@ -1,2 +1,2 @@
-# caDNAno
+# Population genetics
 DNA
