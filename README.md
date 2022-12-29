@@ -1,2 +1,2 @@
 # Population genetics
-DNA
+DNA RNA Protein
