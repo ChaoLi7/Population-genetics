@@ -1,0 +1,46 @@
+"""
+RNA_seq analysis
+"""
+
+Input_fq = "path/02_RNA/01_data/"
+idx = "path/ref_rna.instead.idx"
+gtf = "path/ref.gtf"
+chr_length = "path/chr.length.txt"
+trimmomatic = "path/trimmomatic-0.39.jar"
+
+REP_INDEX = {"sample1"}
+
+rule all:
+    input: 
+        "02_qc/sample1/sample1_1.clean.fastq.gz",
+        "02_qc/sample1/sample1_2.clean.fastq.gz",
+        "02_qc/sample1/sample1_1.unpaired.fastq.gz",
+        "02_qc/sample1/sample1_2.unpaired.fastq.gz",
+        "03.results/sample1"
+
+rule fastqc:
+    input:
+        fq1 = expand("{sample}/{sample}_1.fastq.gz", sample=REP_INDEX),
+        fq2 = expand("{sample}/{sample}_1.fastq.gz", sample=REP_INDEX)
+    output:
+        "02_qc/{sample}/{sample}_1.clean.fastq.gz",
+        "02_qc/{sample}/{sample}_2.clean.fastq.gz",
+        "02_qc/{sample}/{sample}_1.unpaired.fastq.gz",
+        "02_qc/{sample}/{sample}_2.unpaired.fastq.gz"
+    log:
+        "02_qc/log/{sample}_fastqc"
+    shell:
+       """
+        java -Xmx30g -jar {trimmomatic} PE -threads 10 {input.fq1} {input.fq2} {output} LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:40 TOPHRED33 > {log}
+        """
+
+rule kallisto:
+    input:
+        fq1 = "02_qc/{sample}/{sample}_1.clean.fastq.gz",
+        fq2 = "02_qc/{sample}/{sample}_2.clean.fastq.gz"
+    output:
+        "03.results/{sample}"
+    shell:
+        """ 
+        kallisto quant -i {idx} -b 30 -o {output} --gtf {gtf} --genomebam --chromosomes {chr_length} {input.fq1} {input.fq2}
+        """
