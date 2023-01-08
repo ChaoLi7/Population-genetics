@@ -14,7 +14,8 @@ setwd("path")
 library(ggplot2)  
 library(ggthemes)
 library(dplyr)
-library(ggalt)   
+library(ggalt)
+library("readxl")
 
 world <- map_data("world")
 world <- world[world$region != "Antarctica",]    ####去丢南极洲
