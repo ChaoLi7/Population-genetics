@@ -1,0 +1,7 @@
+channels:
+  - conda-forge
+dependencies:
+  - Trimmomatic=0.39
+  - kallisto=0.46.1
+  - python=3.10.8
+  - snakemake=3.19.0
