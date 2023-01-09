@@ -6,7 +6,7 @@ import sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", default="test.input")
-parser.add_argument("-m", default="10,抽取次数", type=float)
+parser.add_argument("-m", default="10", type=float) #number of random
 args = parser.parse_args()
 
 def readdata(filepath):
