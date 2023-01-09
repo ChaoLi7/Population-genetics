@@ -37,6 +37,6 @@ plt.savefig("random.pdf")
 x_0 = np.array([[0], [0]])
 x = np.concatenate((x_0, np.cumsum(delta_x, axis = 1)), axis=1)
 plt.plot(x[0],x[1], "ro-")
-plt.savefig("random2.pdf")
+plt.savefig("random.pdf")
 
 
