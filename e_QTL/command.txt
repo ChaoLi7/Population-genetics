@@ -1,2 +1,0 @@
-# matrix trans
-awk '{i=1;while(i <= NF){col[i]=col[i] $i " ";i=i+1}} END {i=1;while(i<=NF){print col[i];i=i+1}}' genotype.txt | sed 's/[ \t]*$//g' > genotype.trans.txt
