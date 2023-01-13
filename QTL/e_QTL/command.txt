@@ -3,7 +3,7 @@ vcftools --gzvcf sample.vcf --plink --chrom-map chrID --out cattle
 plink --file cattle --chr-set 29 no-xy no-mt --allow-extra-chr --double-id --make-bed --out cattle
 plink --bfile cattle --indep-pairwise 50 5 0.2 --chr-set 29 no-xy no-mt --out cattle
 # genotype to 0 1 2
-plink --bfile cattle --recodeA --out cattle
+plink --bfile cattle --chr-set 29 --allow-extra-chr --recodeA --out cattle
 cat genotype012.txt.raw | cut -d" " -f1,7- | sed 's/_[A-Z]//g' > genotype012.ok.txt
 # matrix trans
 awk '{i=1;while(i <= NF){col[i]=col[i] $i " ";i=i+1}} END {i=1;while(i<=NF){print col[i];i=i+1}}' genotype012.ok.txt | sed 's/[ \t]*$//g' > genotype012.ok.trans.txt
