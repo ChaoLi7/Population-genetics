@@ -1,1 +1,60 @@
+#polygenic risk scoring
+多基因风险评分（Polygenic Risk Scoring, PRS）是一种利用多种遗传变异（通常是单核苷酸多态性，SNPs）来估计个体患某种疾病或表现某种性状的风险的分析方法。下面是一个通用的PRS分析流程（pipeline），包括各个步骤和使用的工具。
 
+Polygenic Risk Scoring (PRS) 分析流程
+1. 数据准备
+基因型数据：需要高质量的基因型数据，通常来自基因芯片或全基因组测序。
+常用格式：PLINK (.bed, .bim, .fam) 或 VCF。
+质量控制（QC）：
+工具：PLINK
+步骤：
+bash
+复制代码
+plink --bfile input_data --geno 0.01 --mind 0.05 --maf 0.01 --hwe 1e-6 --make-bed --out qc_data
+2. 提取目标SNPs
+GWAS结果：从GWAS研究中获取显著关联的SNPs列表及其效应大小（β值或OR）。
+格式：通常是TSV或CSV文件，包含SNP ID、效应等位基因、β值或OR等。
+3. 计算多基因风险评分（PRS）
+工具：PRSice, PLINK, LDpred, PRS-CS
+PRSice：
+安装：PRSice.R和PRSice_linux
+命令：
+bash
+复制代码
+Rscript PRSice.R --base gwas_summary_statistics.txt --target qc_data --out prs_results
+4. 校正人口结构和其他协变量
+人口结构校正：通过主成分分析（PCA）来校正人口结构。
+工具：PLINK
+步骤：
+bash
+复制代码
+plink --bfile qc_data --pca --out pca_results
+5. PRS与表型的关联分析
+关联分析：使用线性回归或逻辑回归模型分析PRS与表型之间的关联。
+工具：R, Python
+步骤：
+R
+复制代码
+# R 代码示例
+prs_data <- read.table("prs_results.best", header=TRUE)
+pca_data <- read.table("pca_results.eigenvec", header=FALSE)
+colnames(pca_data) <- c("FID", "IID", paste0("PC", 1:20))
+merged_data <- merge(prs_data, pca_data, by=c("FID", "IID"))
+
+# 线性回归模型
+model <- lm(phenotype ~ PRS + PC1 + PC2 + PC3 + ..., data=merged_data)
+summary(model)
+6. 结果解释和可视化
+工具：R, Python (Matplotlib, Seaborn)
+步骤：
+R
+复制代码
+# R 代码示例
+library(ggplot2)
+ggplot(merged_data, aes(x=PRS, y=phenotype)) +
+  geom_point() +
+  geom_smooth(method="lm") +
+  theme_minimal() +
+  labs(title="PRS vs Phenotype", x="Polygenic Risk Score", y="Phenotype")
+总结
+这个分析流程涵盖了从数据准备、质量控制、提取目标SNPs、计算PRS、校正人口结构、关联分析到结果解释和可视化的全过程。根据具体的研究需求，可能需要调整某些步骤或使用其他工具。此外，确保使用的GWAS结果和基因型数据具有高质量和可靠性是成功进行PRS分析的关键。
