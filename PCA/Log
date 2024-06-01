@@ -1,1 +1,18 @@
+bcftools view -S Sample.id.list Sample.vcf.gz -Oz -o Sample.id.vcf.gz 
+tabix -p vcf Sample.id.vcf.gz
+plink --vcf Sample.id.vcf.gz --maf 0.05 --recode vcf-iid --keep-allele-order --out Sample.id 
+bgzip Sample.id.vcf
+tabix -p vcf Sample.id.vcf.gz
+
+plink --vcf Sample.id.vcf.gz --freq counts --out filefrquency --double-id --keep pop --chr-set 26 --allow-extra-chr
+plink --vcf Sample.id.vcf.gz --allow-extra-chr --chr-set 26 --out sample1034_dom --make-bed --double-id
+
+awk '{print $1,$1":"$4,$3,$4,$5,$6}' OFS="\t" sample1034_dom.bim > tmp
+rm -rf sample1034_dom.bim
+mv tmp sample1034_dom.bim
+plink --bfile sample1034_dom --indep-pairwise 50 5 0.2 --chr-set 26 --out 1034.prune
+plink --bfile sample1034_dom --extract 1034.prune.prune.in --make-bed --chr-set 26 --out 1034.prune.date
+plink --bfile sample1034_dom --chr-set 26 --distance-matrix --out Distance
+perl plink.distance.matrix.to.mega.pl Distance.mdist.id Distance.mdist 145 sample1034_dom
+smartpca -p eigensoft_smartpca.par 
 
